@@ -2,176 +2,127 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Bouncing and Expanding Cube</title>
+    <title>Ultimate Browser Benchmark</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #111; font-family: 'Segoe UI', sans-serif; }
-        #ui { position: absolute; top: 20px; left: 20px; color: #fff; pointer-events: none; }
-        #stats { font-size: 1rem; margin-top: 10px; }
-        .stat-value { color: #00ffaa; font-weight: bold; }
+        body { background: #0a0a0a; color: #00ff00; font-family: 'Courier New', monospace; text-align: center; margin: 0; }
+        #ui { padding: 40px; }
+        .gauge { font-size: 3rem; margin: 20px; color: #fff; text-shadow: 0 0 10px #00ff00; }
+        #results { display: none; background: #1a1a1a; padding: 20px; border: 2px solid #00ff00; width: 300px; margin: 0 auto; }
+        button { background: #00ff00; color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; font-size: 1.2rem; }
+        button:disabled { background: #333; color: #666; cursor: not-allowed; }
+        #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
+        .score-val { color: #ff00ff; }
     </style>
 </head>
 <body>
 
-    <div id="ui">
-        <h1>EXPANDING CUBE SIMULATION</h1>
-        <div id="stats">
-            Bounces: <span id="bounceCount" class="stat-value">0</span> | 
-            Vertices: <span id="vertCount" class="stat-value">8</span> | 
-            Cube Radius: <span id="cubeRadius" class="stat-value">0.50</span>
-        </div>
+<div id="canvas-container"></div>
+
+<div id="ui">
+    <h1>SYSTEM BENCHMARK v1.0</h1>
+    <p>Testing CPU math, DOM injection, and WebGL fragments...</p>
+    
+    <div class="gauge" id="timer">0.00s</div>
+    
+    <button id="start-btn" onclick="runBenchmark()">START TEST</button>
+
+    <div id="results">
+        <h2>TEST COMPLETE</h2>
+        <p>Math Score: <span id="math-score" class="score-val">0</span></p>
+        <p>DOM Score: <span id="dom-score" class="score-val">0</span></p>
+        <p>GPU Score: <span id="gpu-score" class="score-val">0</span></p>
+        <hr>
+        <h3>TOTAL SCORE: <span id="total-score" style="color:yellow">0</span></h3>
     </div>
+</div>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-            }
-        }
-    </script>
+<script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    let mathCount = 0;
+    let domCount = 0;
+    let gpuFrames = 0;
+    let isRunning = false;
 
-        // --- CONSTANTS AND SETTINGS ---
-        const SPHERE_RADIUS = 5;
-        const INITIAL_CUBE_RADIUS = 0.5;
-        const SIZE_INCREASE_PER_BOUNCE = 1.05; // 5% increase
-        const INITIAL_SPEED = 0.1;
+    // --- GPU TEST SETUP (Three.js) ---
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // --- SCENE, CAMERA, RENDERER ---
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x050505);
+    const geo = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+    const mat = new THREE.MeshNormalMaterial();
+    const mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+    camera.position.z = 30;
 
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(12, 8, 12);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // --- ORBIT CONTROLS (Manual or Auto-Orbit) ---
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.autoRotate = true; // This handles the requested "orbiting camera"
-        controls.autoRotateSpeed = 1.0;
-        controls.minDistance = 6;
-        controls.maxDistance = 25;
-
-        // --- LIGHTING ---
-        const ambientLight = new THREE.AmbientLight(0x404040);
-        scene.add(ambientLight);
-
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(5, 10, 7).normalize();
-        scene.add(directionalLight);
-
-        // --- THE CONTAINING SPHERE ---
-        // Wireframe shows the boundary clearly
-        const sphereGeo = new THREE.SphereGeometry(SPHERE_RADIUS, 32, 32);
-        const sphereMat = new THREE.MeshBasicMaterial({ color: 0x444444, wireframe: true, transparent: true, opacity: 0.3 });
-        const sphereContainer = new THREE.Mesh(sphereGeo, sphereMat);
-        scene.add(sphereContainer);
-
-        // --- THE BOUNCING CUBE ---
-        // 'BoxGeometry' is simple. To add faces visually, we can increase the 'segments'.
-        let currentCubeSegments = 1; 
-        const cubeMaterial = new THREE.MeshPhongMaterial({ color: 0x00ffaa, emissive: 0x002200, shininess: 30, flatShading: false });
+    window.runBenchmark = async function() {
+        if(isRunning) return;
+        isRunning = true;
+        document.getElementById('start-btn').disabled = true;
+        document.getElementById('results').style.display = 'none';
         
-        let cubeGeometry = new THREE.BoxGeometry(INITIAL_CUBE_RADIUS * 2, INITIAL_CUBE_RADIUS * 2, INITIAL_CUBE_RADIUS * 2, currentCubeSegments, currentCubeSegments, currentCubeSegments);
-        const bouncingCube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-        scene.add(bouncingCube);
+        mathCount = 0; domCount = 0; gpuFrames = 0;
+        const startTime = performance.now();
+        const duration = 5000; // 5 Second test
 
-        // --- PHYSICS STATE ---
-        const velocity = new THREE.Vector3(
-            (Math.random() - 0.5) * INITIAL_SPEED * 2,
-            (Math.random() - 0.5) * INITIAL_SPEED * 2,
-            (Math.random() - 0.5) * INITIAL_SPEED * 2
-        );
-        let bounceCount = 0;
-        let currentCubeRadius = INITIAL_CUBE_RADIUS;
+        // 1. MATH TEST (CPU)
+        // Calculating prime numbers in a tight loop
+        const mathTest = setInterval(() => {
+            let num = Math.random() * 10000;
+            Math.sqrt(num) * Math.sin(num) * Math.tan(num);
+            mathCount++;
+        }, 0);
 
-        // UI update function
-        function updateUI() {
-            document.getElementById('bounceCount').innerText = bounceCount;
-            document.getElementById('vertCount').innerText = bouncingCube.geometry.attributes.position.count;
-            document.getElementById('cubeRadius').innerText = currentCubeRadius.toFixed(2);
-        }
+        // 2. DOM TEST (Memory/UI)
+        // Creating and deleting invisible elements
+        const domTest = setInterval(() => {
+            const div = document.createElement('div');
+            document.body.appendChild(div);
+            document.body.removeChild(div);
+            domCount++;
+        }, 0);
 
-        // Handle Cube expansion and Geometry update
-        function expandCube() {
-            // Increase visual faces by increasing segments
-            currentCubeSegments++; 
-            
-            // Increase the base size
-            currentCubeRadius *= SIZE_INCREASE_PER_BOUNCE;
-            
-            // Re-generate geometry. Three.js is not efficient at modifying existing geometries drastically, 
-            // so we generate a new 'BoxGeometry' with more segments and update the mesh.
-            bouncingCube.geometry.dispose(); // Crucial: Free the old geometry from memory
-            
-            const newSize = currentCubeRadius * 2;
-            bouncingCube.geometry = new THREE.BoxGeometry(
-                newSize, newSize, newSize, 
-                currentCubeSegments, currentCubeSegments, currentCubeSegments
-            );
-        }
-
-        // Collision detection and response
-        function checkCollision() {
-            const cubePos = bouncingCube.position;
-            const distance = cubePos.distanceTo(sphereContainer.position);
-
-            // The effective limit is the sphere's inner radius minus the cube's "radius"
-            // (Using the side length is safer than the diagonal for a cube collision)
-            const collisionThreshold = SPHERE_RADIUS - currentCubeRadius;
-
-            if (distance > collisionThreshold) {
-                // Determine the normal vector of the collision point (the direction from center to cube)
-                const normal = cubePos.clone().normalize();
-                
-                // Reflect velocity across this normal: R = V - 2(V·N)N
-                velocity.reflect(normal);
-                
-                // Keep speed constant (can be changed later)
-                // (Velocity reflection handles the change in direction automatically)
-
-                // Physics Hack: Slightly move the cube back inside to prevent getting "stuck" in the boundary
-                const correction = normal.clone().multiplyScalar(0.01);
-                bouncingCube.position.sub(correction);
-
-                // Handle visual effects (more faces and bigger)
-                bounceCount++;
-                expandCube();
-                updateUI();
-            }
-        }
-
-        // --- ANIMATION LOOP ---
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // Update Physics
-            bouncingCube.position.add(velocity);
-            checkCollision();
-
-            // Handle Camera Orbit (managed automatically by controls.autoRotate)
-            controls.update();
-
+        // 3. GPU TEST (Loop)
+        function renderGPU() {
+            if(!isRunning) return;
+            mesh.rotation.x += 0.1;
+            mesh.rotation.y += 0.1;
             renderer.render(scene, camera);
+            gpuFrames++;
+            requestAnimationFrame(renderGPU);
         }
+        renderGPU();
 
-        animate();
+        // Timer Update
+        const timerInterval = setInterval(() => {
+            const elapsed = (performance.now() - startTime) / 1000;
+            document.getElementById('timer').innerText = elapsed.toFixed(2) + "s";
+            if (elapsed >= 5) {
+                stopBenchmark(timerInterval, mathTest, domTest);
+            }
+        }, 10);
+    }
 
-        // Handle Window Resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
+    function stopBenchmark(tI, mI, dI) {
+        isRunning = false;
+        clearInterval(tI);
+        clearInterval(mI);
+        clearInterval(dI);
+        
+        document.getElementById('start-btn').disabled = false;
+        document.getElementById('results').style.display = 'block';
+
+        // Final Score Calculation
+        document.getElementById('math-score').innerText = (mathCount / 1000).toFixed(0);
+        document.getElementById('dom-score').innerText = (domCount / 100).toFixed(0);
+        document.getElementById('gpu-score').innerText = gpuFrames;
+        
+        const total = Math.floor((mathCount/1000) + (domCount/100) + gpuFrames);
+        document.getElementById('total-score').innerText = total.toLocaleString();
+    }
+</script>
+
 </body>
 </html>
