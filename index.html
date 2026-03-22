@@ -2,126 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>UNLIMITED POWER</title>
+    <title>THE MILLION BOXES</title>
     <style>
-        body { margin: 0; background: #000; color: #0f0; font-family: monospace; overflow-x: hidden; text-align: center; }
-        #stats { position: sticky; top: 0; background: rgba(0,0,0,0.8); padding: 20px; border-bottom: 1px solid #0f0; z-index: 100; }
-        #container { display: flex; flex-wrap: wrap; padding: 10px; gap: 1px; justify-content: center; }
+        body { background: #111; color: #0f0; font-family: sans-serif; text-align: center; }
+        #controls { position: sticky; top: 0; background: #222; padding: 20px; border-bottom: 2px solid #0f0; z-index: 100; }
+        #container { display: flex; flex-wrap: wrap; padding: 10px; justify-content: center; }
         
-        /* Tiny buttons for maximum chaos */
-        button { 
-            width: 5px; height: 5px; border: none; background: #0f0; 
-            padding: 0; cursor: pointer; transition: background 0.2s;
-        }
-        button:hover { background: #fff; }
+        /* Making them tiny so they don't take up 50 miles of page */
+        input[type="checkbox"] { width: 12px; height: 12px; margin: 1px; accent-color: #0f0; cursor: crosshair; }
         
-        h1 { margin: 0; font-size: 1.2rem; }
+        .loading { color: yellow; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
 
-    <div id="stats">
-        <h1>POWER OF 10 SPAWNER (NO LIMITS)</h1>
-        <div>10<sup><span id="exponent">0</span></sup> = <span id="total-val">1</span> Buttons</div>
-        <p style="font-size: 10px;">Click any tiny green dot to multiply x10</p>
+    <div id="controls">
+        <h1>THE 1,000,000 CHECKBOX CHALLENGE</h1>
+        <button id="spawn-btn" onclick="startSpawning()" style="padding: 10px 20px; font-size: 1.2rem; cursor: pointer;">
+            SPAWN 1,000,000 BOXES
+        </button>
+        <div id="status">Status: Waiting...</div>
+        <div id="loading-msg" class="loading">SIT TIGHT. BROWSERS HATE THIS...</div>
     </div>
-    
-    <div id="container">
-        <button onclick="nextPower()"></button>
-    </div>
+
+    <div id="container"></div>
 
     <script>
-        let exponent = 0;
-
-        function nextPower() {
-            exponent++;
-            const total = Math.pow(10, exponent);
+        function startSpawning() {
             const container = document.getElementById('container');
-            
-            // Log to console so you can track the death of your RAM
-            console.log("Rendering " + total + " buttons...");
+            const status = document.getElementById('status');
+            const loading = document.getElementById('loading-msg');
+            const btn = document.getElementById('spawn-btn');
 
-            container.innerHTML = ""; // Clear to show the new scale
+            btn.disabled = true;
+            loading.style.display = 'block';
+            status.innerText = "Status: Building DOM Tree...";
 
-            // Using a DocumentFragment for slightly better performance 
-            // during these massive injections
-            const fragment = document.createDocumentFragment();
-            for (let i = 0; i < total; i++) {
-                const btn = document.createElement('button');
-                btn.onclick = nextPower;
-                fragment.appendChild(btn);
-            }
-            container.appendChild(fragment);
+            // We use a Timeout so the UI has a chance to show the "Loading" message 
+            // before the JavaScript "freezes" the main thread.
+            setTimeout(() => {
+                const fragment = document.createDocumentFragment();
+                const total = 1000000;
 
-            // Update UI
-            document.getElementById('exponent').innerText = exponent;
-            document.getElementById('total-val').innerText = total.toLocaleString();
+                for (let i = 0; i < total; i++) {
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    fragment.appendChild(cb);
+                    
+                    // Optional: Periodic UI updates are impossible in a single loop 
+                    // without async, so we just blast it all at once.
+                }
+
+                container.appendChild(fragment);
+                
+                loading.style.display = 'none';
+                status.innerText = "Status: 1,000,000 BOXES RENDERED. GOOD LUCK.";
+                console.log("1 Million checkboxes added to DOM.");
+            }, 100);
         }
     </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Power of 10 Spawner</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #050505; color: #ffae00; text-align: center; padding: 20px; }
-        #container { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-top: 20px; max-height: 70vh; overflow-y: auto; border: 1px solid #333; padding: 10px; }
-        
-        button { 
-            background: #ffae00; color: #000; border: none; 
-            width: 40px; height: 40px; cursor: pointer; font-size: 8px; font-weight: bold;
-        }
-        button:hover { background: #fff; }
-        
-        .stats { font-size: 1.5rem; margin-bottom: 10px; }
-        .warning { color: #ff4444; font-size: 0.9rem; margin-top: 10px; display: none; }
-    </style>
-</head>
-<body>
 
-    <h1>Power of 10</h1>
-    <div class="stats">10<sup><span id="exponent">0</span></sup> = <span id="total-val">1</span> Buttons</div>
-    
-    <div id="container">
-        <button onclick="nextPower()">CLICK</button>
-    </div>
-
-    <p id="warning" class="warning">⚠️ Warning: High button count may slow down your browser!</p>
-
-    <script>
-        let exponent = 0;
-
-        function nextPower() {
-            exponent++;
-            const total = Math.pow(10, exponent);
-            const container = document.getElementById('container');
-            
-            // Show warning if we hit 10,000+
-            if (exponent >= 4) {
-                document.getElementById('warning').style.display = 'block';
-            }
-
-            // Safety check: Don't try to render more than 100,000 buttons 
-            // or the browser will instantly die.
-            if (exponent > 5) {
-                alert("Stopping at 100,000 to save your computer! That's a lot of buttons.");
-                return;
-            }
-
-            container.innerHTML = ""; // Clear old ones to show the new magnitude
-
-            for (let i = 0; i < total; i++) {
-                const btn = document.createElement('button');
-                btn.innerHTML = i + 1;
-                btn.onclick = nextPower;
-                container.appendChild(btn);
-            }
-
-            // Update UI
-            document.getElementById('exponent').innerText = exponent;
-            document.getElementById('total-val').innerText = total.toLocaleString();
-        }
-    </script>
 </body>
 </html>
