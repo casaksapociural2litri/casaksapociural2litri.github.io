@@ -2,85 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Irrational Slicer</title>
+    <title>Power of 10 Spawner</title>
     <style>
-        body { font-family: 'Courier New', monospace; background: #121212; color: #ff00ff; text-align: center; padding: 20px; }
-        #container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 30px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #050505; color: #ffae00; text-align: center; padding: 20px; }
+        #container { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-top: 20px; max-height: 70vh; overflow-y: auto; border: 1px solid #333; padding: 10px; }
         
-        /* The standard button style */
         button { 
-            background: #222; color: #ff00ff; border: 2px solid #ff00ff; 
-            padding: 10px; border-radius: 4px; cursor: pointer;
-            flex-shrink: 0; white-space: nowrap; overflow: hidden;
+            background: #ffae00; color: #000; border: none; 
+            width: 40px; height: 40px; cursor: pointer; font-size: 8px; font-weight: bold;
         }
-
-        /* This class handles the "Cut" button */
-        .fragment {
-            border-right: none; /* Hide the right border to look "cut" */
-            opacity: 0.7;
-            background: linear-gradient(90deg, #440044, #222);
-        }
-
-        .stats { font-size: 1.2rem; margin-bottom: 20px; color: #00ffff; }
+        button:hover { background: #fff; }
+        
+        .stats { font-size: 1.5rem; margin-bottom: 10px; }
+        .warning { color: #ff4444; font-size: 0.9rem; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 
-    <h1>Irrational Slicer</h1>
-    <div class="stats">
-        Target Value (&radic;<span id="n-val">2</span>): <br>
-        <strong id="irrational-val">1.41421356...</strong>
+    <h1>Power of 10</h1>
+    <div class="stats">10<sup><span id="exponent">0</span></sup> = <span id="total-val">1</span> Buttons</div>
+    
+    <div id="container">
+        <button onclick="nextPower()">CLICK</button>
     </div>
 
-    <div id="container">
-        <button onclick="nextIrrational()">Click to Advance</button>
-    </div>
+    <p id="warning" class="warning">⚠️ Warning: High button count may slow down your browser!</p>
 
     <script>
-        let n = 2;
+        let exponent = 0;
 
-        function isPerfectSquare(x) {
-            let s = Math.sqrt(x);
-            return (s % 1 === 0);
-        }
-
-        function nextIrrational() {
-            n++;
-            while(isPerfectSquare(n)) { n++; }
-
-            const val = Math.sqrt(n);
+        function nextPower() {
+            exponent++;
+            const total = Math.pow(10, exponent);
             const container = document.getElementById('container');
-            container.innerHTML = ""; // Clear to redraw accurately
+            
+            // Show warning if we hit 10,000+
+            if (exponent >= 4) {
+                document.getElementById('warning').style.display = 'block';
+            }
 
-            // 1. Get the whole number part (e.g., 3)
-            const wholePart = Math.floor(val);
-            // 2. Get the decimal part (e.g., 0.14)
-            const decimalPart = val - wholePart;
+            // Safety check: Don't try to render more than 100,000 buttons 
+            // or the browser will instantly die.
+            if (exponent > 5) {
+                alert("Stopping at 100,000 to save your computer! That's a lot of buttons.");
+                return;
+            }
 
-            // Create the full buttons
-            for (let i = 0; i < wholePart; i++) {
+            container.innerHTML = ""; // Clear old ones to show the new magnitude
+
+            for (let i = 0; i < total; i++) {
                 const btn = document.createElement('button');
-                btn.innerHTML = "FULL";
-                btn.onclick = nextIrrational;
+                btn.innerHTML = i + 1;
+                btn.onclick = nextPower;
                 container.appendChild(btn);
             }
 
-            // Create the "Cut" button (the irrational fragment)
-            if (decimalPart > 0) {
-                const frag = document.createElement('button');
-                frag.className = "fragment";
-                frag.innerHTML = "PART";
-                frag.onclick = nextIrrational;
-                
-                // We use CSS width to "cut" the button
-                // We'll give it a base width of 100px and multiply by the decimal
-                frag.style.width = (decimalPart * 100) + "px";
-                container.appendChild(frag);
-            }
-
             // Update UI
-            document.getElementById('n-val').innerText = n;
-            document.getElementById('irrational-val').innerText = val.toFixed(10) + "...";
+            document.getElementById('exponent').innerText = exponent;
+            document.getElementById('total-val').innerText = total.toLocaleString();
         }
     </script>
 </body>
