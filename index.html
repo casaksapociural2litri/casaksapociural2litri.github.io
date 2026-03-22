@@ -2,6 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>UNLIMITED POWER</title>
+    <style>
+        body { margin: 0; background: #000; color: #0f0; font-family: monospace; overflow-x: hidden; text-align: center; }
+        #stats { position: sticky; top: 0; background: rgba(0,0,0,0.8); padding: 20px; border-bottom: 1px solid #0f0; z-index: 100; }
+        #container { display: flex; flex-wrap: wrap; padding: 10px; gap: 1px; justify-content: center; }
+        
+        /* Tiny buttons for maximum chaos */
+        button { 
+            width: 5px; height: 5px; border: none; background: #0f0; 
+            padding: 0; cursor: pointer; transition: background 0.2s;
+        }
+        button:hover { background: #fff; }
+        
+        h1 { margin: 0; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+
+    <div id="stats">
+        <h1>POWER OF 10 SPAWNER (NO LIMITS)</h1>
+        <div>10<sup><span id="exponent">0</span></sup> = <span id="total-val">1</span> Buttons</div>
+        <p style="font-size: 10px;">Click any tiny green dot to multiply x10</p>
+    </div>
+    
+    <div id="container">
+        <button onclick="nextPower()"></button>
+    </div>
+
+    <script>
+        let exponent = 0;
+
+        function nextPower() {
+            exponent++;
+            const total = Math.pow(10, exponent);
+            const container = document.getElementById('container');
+            
+            // Log to console so you can track the death of your RAM
+            console.log("Rendering " + total + " buttons...");
+
+            container.innerHTML = ""; // Clear to show the new scale
+
+            // Using a DocumentFragment for slightly better performance 
+            // during these massive injections
+            const fragment = document.createDocumentFragment();
+            for (let i = 0; i < total; i++) {
+                const btn = document.createElement('button');
+                btn.onclick = nextPower;
+                fragment.appendChild(btn);
+            }
+            container.appendChild(fragment);
+
+            // Update UI
+            document.getElementById('exponent').innerText = exponent;
+            document.getElementById('total-val').innerText = total.toLocaleString();
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <title>Power of 10 Spawner</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #050505; color: #ffae00; text-align: center; padding: 20px; }
