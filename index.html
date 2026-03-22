@@ -3,59 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Doubler</title>
+    <title>Prime Button Spawner</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #1a1a1a; 
-            color: white;
-            text-align: center; 
-            padding: 40px; 
-        }
+        body { font-family: sans-serif; background: #0f172a; color: #f8fafc; text-align: center; padding: 20px; }
+        #container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
         button { 
-            margin: 5px; 
-            padding: 12px 18px; 
-            background-color: #007bff; 
-            color: white; 
-            border: none; 
-            border-radius: 5px;
-            cursor: pointer; 
-            transition: transform 0.1s;
+            background: #8b5cf6; color: white; border: none; padding: 10px 15px; 
+            border-radius: 8px; cursor: pointer; font-weight: bold;
         }
-        button:hover { background-color: #0056b3; transform: scale(1.05); }
-        button:active { transform: scale(0.95); }
-        #stats { font-size: 1.5rem; margin-bottom: 20px; color: #00ffcc; }
+        button:hover { background: #7c3aed; }
+        .stats { font-size: 1.2rem; margin-bottom: 10px; color: #22d3ee; }
     </style>
 </head>
 <body>
 
-    <h1>The Button Doubler</h1>
-    <div id="stats">Total Buttons: <span id="count">1</span></div>
-    
+    <h1>Prime Spawner</h1>
+    <div class="stats">Current Prime: <span id="prime-display">2</span></div>
+    <p>Click any button to reach the next prime number!</p>
+
     <div id="container">
-        <button onclick="doubleButtons()">Click to Double!</button>
+        <button onclick="spawnToNextPrime()">Click Me</button>
+        <button onclick="spawnToNextPrime()">Click Me</button>
     </div>
 
     <script>
-        function doubleButtons() {
-            const container = document.getElementById('container');
-            
-            // 1. See how many buttons are currently on the screen
-            const currentButtons = container.querySelectorAll('button');
-            const amountToAdd = currentButtons.length;
+        let currentPrime = 2;
 
-            // 2. Loop that many times to create the clones
-            for (let i = 0; i < amountToAdd; i++) {
-                const newBtn = document.createElement('button');
-                newBtn.innerHTML = "Click to Double!";
-                newBtn.onclick = doubleButtons;
-                container.appendChild(newBtn);
+        // Function to check if a number is prime
+        function isPrime(num) {
+            for (let i = 2, s = Math.sqrt(num); i <= s; i++) {
+                if (num % i === 0) return false;
+            }
+            return num > 1;
+        }
+
+        // Function to find the next prime
+        function getNextPrime(n) {
+            let next = n + 1;
+            while (!isPrime(next)) {
+                next++;
+            }
+            return next;
+        }
+
+        function spawnToNextPrime() {
+            const container = document.getElementById('container');
+            const nextPrime = getNextPrime(currentPrime);
+            
+            // Calculate how many NEW buttons we need
+            const diff = nextPrime - currentPrime;
+
+            for (let i = 0; i < diff; i++) {
+                const btn = document.createElement('button');
+                btn.innerHTML = "Click Me";
+                btn.onclick = spawnToNextPrime;
+                container.appendChild(btn);
             }
 
-            // 3. Update the counter at the top
-            document.getElementById('count').innerText = container.querySelectorAll('button').length;
+            // Update the global tracker and the UI
+            currentPrime = nextPrime;
+            document.getElementById('prime-display').innerText = currentPrime;
         }
     </script>
-
 </body>
 </html>
