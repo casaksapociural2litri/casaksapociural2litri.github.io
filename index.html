@@ -2,127 +2,195 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ultimate Browser Benchmark</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>čašekOS</title>
     <style>
-        body { background: #0a0a0a; color: #00ff00; font-family: 'Courier New', monospace; text-align: center; margin: 0; }
-        #ui { padding: 40px; }
-        .gauge { font-size: 3rem; margin: 20px; color: #fff; text-shadow: 0 0 10px #00ff00; }
-        #results { display: none; background: #1a1a1a; padding: 20px; border: 2px solid #00ff00; width: 300px; margin: 0 auto; }
-        button { background: #00ff00; color: #000; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; font-size: 1.2rem; }
-        button:disabled { background: #333; color: #666; cursor: not-allowed; }
-        #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
-        .score-val { color: #ff00ff; }
+        :root {
+            --bg-color: #000;
+            --glass: rgba(255, 255, 255, 0.1);
+            --accent: #00f2ff;
+        }
+
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica;
+            background: #000;
+        }
+
+        /* The Phone Frame */
+        #phone {
+            width: 100vw; height: 100vh;
+            background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop') center/cover;
+            position: relative;
+            transition: filter 0.5s;
+        }
+
+        /* --- DYNAMIC ISLAND --- */
+        #dynamic-island {
+            position: absolute;
+            top: 15px; left: 50%;
+            transform: translateX(-50%);
+            width: 120px; height: 35px;
+            background: #000;
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 12px; overflow: hidden;
+            cursor: pointer;
+        }
+
+        #dynamic-island.expanded {
+            width: 350px; height: 80px;
+            border-radius: 35px;
+        }
+
+        /* --- HOME SCREEN GRID --- */
+        #home-screen {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            padding: 80px 30px;
+            display: none;
+        }
+
+        .app-icon {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            color: white; font-size: 12px; cursor: pointer;
+        }
+
+        .icon-box {
+            width: 60px; height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(145deg, #1e1e1e, #111);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+        }
+
+        /* --- LOCK SCREEN --- */
+        #lock-screen {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: flex-start; padding-top: 120px;
+            color: white; z-index: 50;
+            backdrop-filter: blur(10px);
+        }
+
+        .time { font-size: 80px; font-weight: 200; }
+        .date { font-size: 20px; margin-top: -10px; }
+
+        /* --- NAVIGATION BAR --- */
+        #nav-bar {
+            position: absolute; bottom: 10px; left: 50%;
+            transform: translateX(-50%);
+            width: 130px; height: 5px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 10px; cursor: pointer;
+        }
+
+        /* --- APPS WINDOW --- */
+        .app-window {
+            position: absolute; inset: 0;
+            background: white; z-index: 100;
+            display: none; transform: translateY(100%);
+            transition: transform 0.4s ease-in-out;
+            padding: 40px 20px; border-radius: 30px 30px 0 0;
+        }
+
+        .app-window.active { display: block; transform: translateY(0); }
     </style>
 </head>
 <body>
 
-<div id="canvas-container"></div>
+    <div id="phone">
+        <div id="dynamic-island" onclick="toggleIsland()">
+            <span id="island-content"></span>
+        </div>
 
-<div id="ui">
-    <h1>SYSTEM BENCHMARK v1.0</h1>
-    <p>Testing CPU math, DOM injection, and WebGL fragments...</p>
-    
-    <div class="gauge" id="timer">0.00s</div>
-    
-    <button id="start-btn" onclick="runBenchmark()">START TEST</button>
+        <div id="lock-screen" onclick="unlock()">
+            <div class="time" id="clock">12:00</div>
+            <div class="date">Sunday, March 22</div>
+            <p style="margin-top: auto; margin-bottom: 50px; opacity: 0.6;">Tap to unlock čašekOS</p>
+        </div>
 
-    <div id="results">
-        <h2>TEST COMPLETE</h2>
-        <p>Math Score: <span id="math-score" class="score-val">0</span></p>
-        <p>DOM Score: <span id="dom-score" class="score-val">0</span></p>
-        <p>GPU Score: <span id="gpu-score" class="score-val">0</span></p>
-        <hr>
-        <h3>TOTAL SCORE: <span id="total-score" style="color:yellow">0</span></h3>
+        <div id="home-screen">
+            <div class="app-icon" onclick="openApp('notes')">
+                <div class="icon-box" style="background: #ffcc00;">📝</div>
+                <span>Notes</span>
+            </div>
+            <div class="app-icon" onclick="notifyIsland('Charging... 88%')">
+                <div class="icon-box" style="background: #4cd964;">⚡</div>
+                <span>Battery</span>
+            </div>
+            <div class="app-icon" onclick="openApp('music')">
+                <div class="icon-box" style="background: #ff2d55;">🎵</div>
+                <span>Music</span>
+            </div>
+            <div class="app-icon" onclick="location.reload()">
+                <div class="icon-box" style="background: #5856d6;">🔄</div>
+                <span>Reset</span>
+            </div>
+        </div>
+
+        <div id="notes" class="app-window">
+            <h1>Notes</h1>
+            <textarea style="width: 100%; height: 200px; border: none; font-size: 18px;" placeholder="Write something..."></textarea>
+        </div>
+
+        <div id="nav-bar" onclick="goHome()"></div>
     </div>
-</div>
 
-<script type="module">
-    import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-
-    let mathCount = 0;
-    let domCount = 0;
-    let gpuFrames = 0;
-    let isRunning = false;
-
-    // --- GPU TEST SETUP (Three.js) ---
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: false });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-    const geo = new THREE.TorusKnotGeometry(10, 3, 100, 16);
-    const mat = new THREE.MeshNormalMaterial();
-    const mesh = new THREE.Mesh(geo, mat);
-    scene.add(mesh);
-    camera.position.z = 30;
-
-    window.runBenchmark = async function() {
-        if(isRunning) return;
-        isRunning = true;
-        document.getElementById('start-btn').disabled = true;
-        document.getElementById('results').style.display = 'none';
-        
-        mathCount = 0; domCount = 0; gpuFrames = 0;
-        const startTime = performance.now();
-        const duration = 5000; // 5 Second test
-
-        // 1. MATH TEST (CPU)
-        // Calculating prime numbers in a tight loop
-        const mathTest = setInterval(() => {
-            let num = Math.random() * 10000;
-            Math.sqrt(num) * Math.sin(num) * Math.tan(num);
-            mathCount++;
-        }, 0);
-
-        // 2. DOM TEST (Memory/UI)
-        // Creating and deleting invisible elements
-        const domTest = setInterval(() => {
-            const div = document.createElement('div');
-            document.body.appendChild(div);
-            document.body.removeChild(div);
-            domCount++;
-        }, 0);
-
-        // 3. GPU TEST (Loop)
-        function renderGPU() {
-            if(!isRunning) return;
-            mesh.rotation.x += 0.1;
-            mesh.rotation.y += 0.1;
-            renderer.render(scene, camera);
-            gpuFrames++;
-            requestAnimationFrame(renderGPU);
+    <script>
+        // Update Clock
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('clock').innerText = `${h}:${m}`;
         }
-        renderGPU();
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        // Timer Update
-        const timerInterval = setInterval(() => {
-            const elapsed = (performance.now() - startTime) / 1000;
-            document.getElementById('timer').innerText = elapsed.toFixed(2) + "s";
-            if (elapsed >= 5) {
-                stopBenchmark(timerInterval, mathTest, domTest);
-            }
-        }, 10);
-    }
+        // OS Logic
+        function unlock() {
+            document.getElementById('lock-screen').style.display = 'none';
+            document.getElementById('home-screen').style.display = 'grid';
+            notifyIsland("Welcome to čašekOS");
+        }
 
-    function stopBenchmark(tI, mI, dI) {
-        isRunning = false;
-        clearInterval(tI);
-        clearInterval(mI);
-        clearInterval(dI);
-        
-        document.getElementById('start-btn').disabled = false;
-        document.getElementById('results').style.display = 'block';
+        function goHome() {
+            document.querySelectorAll('.app-window').forEach(app => {
+                app.classList.remove('active');
+            });
+            notifyIsland("čašekOS Home");
+        }
 
-        // Final Score Calculation
-        document.getElementById('math-score').innerText = (mathCount / 1000).toFixed(0);
-        document.getElementById('dom-score').innerText = (domCount / 100).toFixed(0);
-        document.getElementById('gpu-score').innerText = gpuFrames;
-        
-        const total = Math.floor((mathCount/1000) + (domCount/100) + gpuFrames);
-        document.getElementById('total-score').innerText = total.toLocaleString();
-    }
-</script>
+        function openApp(id) {
+            document.getElementById(id).classList.add('active');
+            notifyIsland(`Opening ${id}...`);
+        }
 
+        // Dynamic Island Logic
+        let islandTimeout;
+        function notifyIsland(text) {
+            const island = document.getElementById('dynamic-island');
+            const content = document.getElementById('island-content');
+            
+            clearTimeout(islandTimeout);
+            island.classList.add('expanded');
+            content.innerText = text;
+
+            islandTimeout = setTimeout(() => {
+                island.classList.remove('expanded');
+                setTimeout(() => content.innerText = "", 400);
+            }, 3000);
+        }
+
+        function toggleIsland() {
+            const island = document.getElementById('dynamic-island');
+            island.classList.toggle('expanded');
+        }
+    </script>
 </body>
 </html>
