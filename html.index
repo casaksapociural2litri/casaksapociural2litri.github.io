@@ -1,1 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Button Generator</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; text-align: center; }
+        button { margin: 5px; padding: 10px 20px; cursor: pointer; }
+        #container { margin-top: 20px; }
+    </style>
+</head>
+<body>
 
+    <h2>The Infinite Button Spawner</h2>
+    <p>Click the button to create a clone!</p>
+
+    <div id="container">
+        <button onclick="createButton()">Click Me!</button>
+    </div>
+
+    <script>
+        function createButton() {
+            // 1. Select the container
+            const container = document.getElementById('container');
+            
+            // 2. Create a new button element
+            const newBtn = document.createElement('button');
+            
+            // 3. Set the text and the click action
+            newBtn.innerHTML = "Click Me!";
+            newBtn.onclick = createButton; // This makes the new button functional too!
+            
+            // 4. Add it to the page
+            container.appendChild(newBtn);
+        }
+    </script>
+
+</body>
+</html>
