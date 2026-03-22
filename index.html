@@ -2,67 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prime Button Spawner</title>
+    <title>Irrational Slicer</title>
     <style>
-        body { font-family: sans-serif; background: #0f172a; color: #f8fafc; text-align: center; padding: 20px; }
-        #container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
+        body { font-family: 'Courier New', monospace; background: #121212; color: #ff00ff; text-align: center; padding: 20px; }
+        #container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 30px; }
+        
+        /* The standard button style */
         button { 
-            background: #8b5cf6; color: white; border: none; padding: 10px 15px; 
-            border-radius: 8px; cursor: pointer; font-weight: bold;
+            background: #222; color: #ff00ff; border: 2px solid #ff00ff; 
+            padding: 10px; border-radius: 4px; cursor: pointer;
+            flex-shrink: 0; white-space: nowrap; overflow: hidden;
         }
-        button:hover { background: #7c3aed; }
-        .stats { font-size: 1.2rem; margin-bottom: 10px; color: #22d3ee; }
+
+        /* This class handles the "Cut" button */
+        .fragment {
+            border-right: none; /* Hide the right border to look "cut" */
+            opacity: 0.7;
+            background: linear-gradient(90deg, #440044, #222);
+        }
+
+        .stats { font-size: 1.2rem; margin-bottom: 20px; color: #00ffff; }
     </style>
 </head>
 <body>
 
-    <h1>Prime Spawner</h1>
-    <div class="stats">Current Prime: <span id="prime-display">2</span></div>
-    <p>Click any button to reach the next prime number!</p>
+    <h1>Irrational Slicer</h1>
+    <div class="stats">
+        Target Value (&radic;<span id="n-val">2</span>): <br>
+        <strong id="irrational-val">1.41421356...</strong>
+    </div>
 
     <div id="container">
-        <button onclick="spawnToNextPrime()">Click Me</button>
-        <button onclick="spawnToNextPrime()">Click Me</button>
+        <button onclick="nextIrrational()">Click to Advance</button>
     </div>
 
     <script>
-        let currentPrime = 2;
+        let n = 2;
 
-        // Function to check if a number is prime
-        function isPrime(num) {
-            for (let i = 2, s = Math.sqrt(num); i <= s; i++) {
-                if (num % i === 0) return false;
-            }
-            return num > 1;
+        function isPerfectSquare(x) {
+            let s = Math.sqrt(x);
+            return (s % 1 === 0);
         }
 
-        // Function to find the next prime
-        function getNextPrime(n) {
-            let next = n + 1;
-            while (!isPrime(next)) {
-                next++;
-            }
-            return next;
-        }
+        function nextIrrational() {
+            n++;
+            while(isPerfectSquare(n)) { n++; }
 
-        function spawnToNextPrime() {
+            const val = Math.sqrt(n);
             const container = document.getElementById('container');
-            const nextPrime = getNextPrime(currentPrime);
-            
-            // Calculate how many NEW buttons we need
-            const diff = nextPrime - currentPrime;
+            container.innerHTML = ""; // Clear to redraw accurately
 
-            for (let i = 0; i < diff; i++) {
+            // 1. Get the whole number part (e.g., 3)
+            const wholePart = Math.floor(val);
+            // 2. Get the decimal part (e.g., 0.14)
+            const decimalPart = val - wholePart;
+
+            // Create the full buttons
+            for (let i = 0; i < wholePart; i++) {
                 const btn = document.createElement('button');
-                btn.innerHTML = "Click Me";
-                btn.onclick = spawnToNextPrime;
+                btn.innerHTML = "FULL";
+                btn.onclick = nextIrrational;
                 container.appendChild(btn);
             }
 
-            // Update the global tracker and the UI
-            currentPrime = nextPrime;
-            document.getElementById('prime-display').innerText = currentPrime;
+            // Create the "Cut" button (the irrational fragment)
+            if (decimalPart > 0) {
+                const frag = document.createElement('button');
+                frag.className = "fragment";
+                frag.innerHTML = "PART";
+                frag.onclick = nextIrrational;
+                
+                // We use CSS width to "cut" the button
+                // We'll give it a base width of 100px and multiply by the decimal
+                frag.style.width = (decimalPart * 100) + "px";
+                container.appendChild(frag);
+            }
+
+            // Update UI
+            document.getElementById('n-val').innerText = n;
+            document.getElementById('irrational-val').innerText = val.toFixed(10) + "...";
         }
     </script>
 </body>
