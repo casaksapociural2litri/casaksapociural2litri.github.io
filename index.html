@@ -2,149 +2,176 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ROBLOX 2013 Simulation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Bouncing and Expanding Cube</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #84C1FF; font-family: 'Arial', sans-serif; }
-        
-        /* Classic 2013 Topbar */
-        #topbar {
-            position: absolute; top: 0; width: 100%; height: 40px;
-            background: rgba(0, 0, 0, 0.7); display: flex; align-items: center;
-            padding: 0 20px; color: white; font-weight: bold; z-index: 10;
-        }
-
-        #ui-overlay {
-            position: absolute; bottom: 20px; left: 20px; color: white;
-            text-shadow: 2px 2px 0px #000; pointer-events: none;
-        }
+        body { margin: 0; overflow: hidden; background: #111; font-family: 'Segoe UI', sans-serif; }
+        #ui { position: absolute; top: 20px; left: 20px; color: #fff; pointer-events: none; }
+        #stats { font-size: 1rem; margin-top: 10px; }
+        .stat-value { color: #00ffaa; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="topbar">
-        <span style="color: #ff0000;">ROBLOX</span> 
-        <span style="margin-left: 20px; font-size: 12px; color: #ccc;">v2013.Simulation</span>
-    </div>
-
-    <div id="ui-overlay">
-        <h2>Place: The Void</h2>
-        <p>WASD to Move | Space to Jump</p>
+    <div id="ui">
+        <h1>EXPANDING CUBE SIMULATION</h1>
+        <div id="stats">
+            Bounces: <span id="bounceCount" class="stat-value">0</span> | 
+            Vertices: <span id="vertCount" class="stat-value">8</span> | 
+            Cube Radius: <span id="cubeRadius" class="stat-value">0.50</span>
+        </div>
     </div>
 
     <script type="importmap">
-        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
     </script>
 
     <script type="module">
         import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-        // --- SCENE SETUP ---
+        // --- CONSTANTS AND SETTINGS ---
+        const SPHERE_RADIUS = 5;
+        const INITIAL_CUBE_RADIUS = 0.5;
+        const SIZE_INCREASE_PER_BOUNCE = 1.05; // 5% increase
+        const INITIAL_SPEED = 0.1;
+
+        // --- SCENE, CAMERA, RENDERER ---
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x84C1FF); // Classic Sky Blue
-        
+        scene.background = new THREE.Color(0x050505);
+
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: false }); // Low AA for that 2013 look
+        camera.position.set(12, 8, 12);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // --- LIGHTING (The "Bright" Legacy Look) ---
-        const sun = new THREE.DirectionalLight(0xffffff, 1.5);
-        sun.position.set(50, 100, 50);
-        scene.add(sun);
-        scene.add(new THREE.AmbientLight(0x606060));
+        // --- ORBIT CONTROLS (Manual or Auto-Orbit) ---
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.autoRotate = true; // This handles the requested "orbiting camera"
+        controls.autoRotateSpeed = 1.0;
+        controls.minDistance = 6;
+        controls.maxDistance = 25;
 
-        // --- THE BASEPLATE ---
-        // Creating the "Studs" texture using a Canvas
-        const canvas = document.createElement('canvas');
-        canvas.width = 64; canvas.height = 64;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#212121'; // Dark Grey
-        ctx.fillRect(0, 0, 64, 64);
-        ctx.strokeStyle = '#333';
-        ctx.beginPath(); ctx.arc(32, 32, 15, 0, Math.PI * 2); ctx.stroke(); // The Stud circle
+        // --- LIGHTING ---
+        const ambientLight = new THREE.AmbientLight(0x404040);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 10, 7).normalize();
+        scene.add(directionalLight);
+
+        // --- THE CONTAINING SPHERE ---
+        // Wireframe shows the boundary clearly
+        const sphereGeo = new THREE.SphereGeometry(SPHERE_RADIUS, 32, 32);
+        const sphereMat = new THREE.MeshBasicMaterial({ color: 0x444444, wireframe: true, transparent: true, opacity: 0.3 });
+        const sphereContainer = new THREE.Mesh(sphereGeo, sphereMat);
+        scene.add(sphereContainer);
+
+        // --- THE BOUNCING CUBE ---
+        // 'BoxGeometry' is simple. To add faces visually, we can increase the 'segments'.
+        let currentCubeSegments = 1; 
+        const cubeMaterial = new THREE.MeshPhongMaterial({ color: 0x00ffaa, emissive: 0x002200, shininess: 30, flatShading: false });
         
-        const studTexture = new THREE.CanvasTexture(canvas);
-        studTexture.wrapS = studTexture.wrapT = THREE.RepeatWrapping;
-        studTexture.repeat.set(50, 50);
+        let cubeGeometry = new THREE.BoxGeometry(INITIAL_CUBE_RADIUS * 2, INITIAL_CUBE_RADIUS * 2, INITIAL_CUBE_RADIUS * 2, currentCubeSegments, currentCubeSegments, currentCubeSegments);
+        const bouncingCube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        scene.add(bouncingCube);
 
-        const groundGeo = new THREE.BoxGeometry(500, 2, 500);
-        const groundMat = new THREE.MeshStandardMaterial({ map: studTexture, color: 0x333333 });
-        const baseplate = new THREE.Mesh(groundGeo, groundMat);
-        baseplate.position.y = -1;
-        scene.add(baseplate);
+        // --- PHYSICS STATE ---
+        const velocity = new THREE.Vector3(
+            (Math.random() - 0.5) * INITIAL_SPEED * 2,
+            (Math.random() - 0.5) * INITIAL_SPEED * 2,
+            (Math.random() - 0.5) * INITIAL_SPEED * 2
+        );
+        let bounceCount = 0;
+        let currentCubeRadius = INITIAL_CUBE_RADIUS;
 
-        // --- THE CHARACTER (The classic "Noob") ---
-        const charGroup = new THREE.Group();
-        
-        const createPart = (w, h, d, color, y) => {
-            const mesh = new THREE.Mesh(
-                new THREE.BoxGeometry(w, h, d),
-                new THREE.MeshStandardMaterial({ color: color })
+        // UI update function
+        function updateUI() {
+            document.getElementById('bounceCount').innerText = bounceCount;
+            document.getElementById('vertCount').innerText = bouncingCube.geometry.attributes.position.count;
+            document.getElementById('cubeRadius').innerText = currentCubeRadius.toFixed(2);
+        }
+
+        // Handle Cube expansion and Geometry update
+        function expandCube() {
+            // Increase visual faces by increasing segments
+            currentCubeSegments++; 
+            
+            // Increase the base size
+            currentCubeRadius *= SIZE_INCREASE_PER_BOUNCE;
+            
+            // Re-generate geometry. Three.js is not efficient at modifying existing geometries drastically, 
+            // so we generate a new 'BoxGeometry' with more segments and update the mesh.
+            bouncingCube.geometry.dispose(); // Crucial: Free the old geometry from memory
+            
+            const newSize = currentCubeRadius * 2;
+            bouncingCube.geometry = new THREE.BoxGeometry(
+                newSize, newSize, newSize, 
+                currentCubeSegments, currentCubeSegments, currentCubeSegments
             );
-            mesh.position.y = y;
-            charGroup.add(mesh);
-        };
+        }
 
-        createPart(2, 2, 2, 0xFFFF00, 4);   // Head
-        createPart(4, 4, 2, 0x0000FF, 1);   // Torso (Blue)
-        createPart(1.5, 4, 1.5, 0xFFFF00, 1); // Left Arm
-        createPart(1.5, 4, 1.5, 0xFFFF00, 1); // Right Arm (Offset them in real logic)
-        createPart(1.8, 4, 1.8, 0x00FF00, -3); // Legs (Green)
-        
-        charGroup.children[2].position.x = -2.8;
-        charGroup.children[3].position.x = 2.8;
-        charGroup.children[4].position.x = -1.1;
-        const rightLeg = charGroup.children[4].clone();
-        rightLeg.position.x = 1.1;
-        charGroup.add(rightLeg);
+        // Collision detection and response
+        function checkCollision() {
+            const cubePos = bouncingCube.position;
+            const distance = cubePos.distanceTo(sphereContainer.position);
 
-        scene.add(charGroup);
+            // The effective limit is the sphere's inner radius minus the cube's "radius"
+            // (Using the side length is safer than the diagonal for a cube collision)
+            const collisionThreshold = SPHERE_RADIUS - currentCubeRadius;
 
-        // --- MOVEMENT ---
-        const keys = {};
-        let moveSpeed = 0.5;
-        let yVelocity = 0;
-        let isJumping = false;
+            if (distance > collisionThreshold) {
+                // Determine the normal vector of the collision point (the direction from center to cube)
+                const normal = cubePos.clone().normalize();
+                
+                // Reflect velocity across this normal: R = V - 2(V·N)N
+                velocity.reflect(normal);
+                
+                // Keep speed constant (can be changed later)
+                // (Velocity reflection handles the change in direction automatically)
 
-        window.addEventListener('keydown', (e) => keys[e.code] = true);
-        window.addEventListener('keyup', (e) => keys[e.code] = false);
+                // Physics Hack: Slightly move the cube back inside to prevent getting "stuck" in the boundary
+                const correction = normal.clone().multiplyScalar(0.01);
+                bouncingCube.position.sub(correction);
 
-        camera.position.set(0, 15, 30);
-        camera.lookAt(0, 0, 0);
+                // Handle visual effects (more faces and bigger)
+                bounceCount++;
+                expandCube();
+                updateUI();
+            }
+        }
 
+        // --- ANIMATION LOOP ---
         function animate() {
             requestAnimationFrame(animate);
 
-            // Simple WASD
-            if (keys['KeyW']) charGroup.position.z -= moveSpeed;
-            if (keys['KeyS']) charGroup.position.z += moveSpeed;
-            if (keys['KeyA']) charGroup.position.x -= moveSpeed;
-            if (keys['KeyD']) charGroup.position.x += moveSpeed;
+            // Update Physics
+            bouncingCube.position.add(velocity);
+            checkCollision();
 
-            // Simple Gravity/Jump
-            if (keys['Space'] && !isJumping) {
-                yVelocity = 0.5;
-                isJumping = true;
-            }
-
-            charGroup.position.y += yVelocity;
-            if (charGroup.position.y > 4) {
-                yVelocity -= 0.02; // Gravity
-            } else {
-                charGroup.position.y = 4;
-                yVelocity = 0;
-                isJumping = false;
-            }
-
-            // Camera follow
-            camera.position.x = charGroup.position.x;
-            camera.position.z = charGroup.position.z + 30;
-            camera.lookAt(charGroup.position);
+            // Handle Camera Orbit (managed automatically by controls.autoRotate)
+            controls.update();
 
             renderer.render(scene, camera);
         }
 
         animate();
+
+        // Handle Window Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
