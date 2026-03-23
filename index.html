@@ -1,268 +1,77 @@
-<!-- (c) Layout created by TheJasmineSixx (LunaGloomyCore) (https://layouts.spacehey.com/layout?id=611) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pi Button Multiplier</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
+        #pi-bar { 
+            padding: 15px; background: #fff; border: 1px solid #ddd; 
+            min-height: 30px; margin-bottom: 20px; word-break: break-all;
+            font-family: monospace; font-size: 1.2rem;
+        }
+        .zero-container { display: inline-block; text-align: center; position: relative; }
+        .one-above { font-size: 0.6rem; display: block; line-height: 1; color: red; }
+        #button-container { display: flex; flex-wrap: wrap; gap: 10px; }
+        button { padding: 10px 15px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        .stats { margin-bottom: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
 
-<img src="imageorglittertexturl"/>
+    <h2>Pi Multiplier</h2>
+    <div class="stats">Digits Clicked: <span id="count">0</span> | Total Buttons: <span id="btn-total">1</span></div>
+    
+    <div id="pi-bar">Pi sequence will appear here...</div>
 
-<img src="imageorglittertexturl"/>
+    <div id="button-container">
+        <button onclick="multiplyButtons()">Click Me</button>
+    </div>
 
-<img src="imageorglittertexturl"/>
+    <script>
+        // A string of Pi digits (first 1000 for demo purposes)
+        const piDigits = "31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679";
+        let currentIndex = 0;
 
+        function multiplyButtons() {
+            if (currentIndex >= piDigits.length) {
+                alert("You've reached the end of the pre-loaded Pi digits!");
+                return;
+            }
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Potta+One&display=swap');
-body{font-family: "potta one" ;}
-</style> 
+            const rawDigit = parseInt(piDigits[currentIndex]);
+            const displayBar = document.getElementById('pi-bar');
+            const container = document.getElementById('button-container');
+            
+            // 1. Update the Pi Bar
+            if (currentIndex === 0) displayBar.innerHTML = ""; // Clear initial text
+            
+            if (rawDigit === 0) {
+                displayBar.innerHTML += `<span class="zero-container"><span class="one-above">1</span>0</span>`;
+            } else {
+                displayBar.innerHTML += rawDigit;
+            }
 
-CODE BELOW GOES UNDER YOUR ABOUT ME PARAGRAPH
+            // 2. Calculate Multiplier (replace 0 with 1)
+            const multiplier = rawDigit === 0 ? 1 : rawDigit;
+            const currentButtons = container.querySelectorAll('button').length;
+            const targetCount = currentButtons * multiplier;
 
-<img src="giforimageurl"/>
+            // 3. Add the new buttons
+            // Warning: This can grow VERY fast (exponentially)
+            const buttonsToAdd = targetCount - currentButtons;
+            for (let i = 0; i < buttonsToAdd; i++) {
+                const btn = document.createElement('button');
+                btn.innerText = "Click Me";
+                btn.onclick = multiplyButtons;
+                container.appendChild(btn);
+            }
 
-<img src="giforimageurl"/> 
-
-<img src="giforimageurl"/> 
-
-<img src="giforimageurl"/> 
-<img src="giforimageurl"/> 
-
-<img src="giforimageurl"/>
-
-<img src="giforimageurlORglittertext"/>
-
-TO ADD YOUTUBE VIDEO CLICK SHARE, EMBED, COPY THEN PASTE HERE ONLY CHANGING THE WIDTH AND HEIGHT TO 350 AND 215
-
-
-MAIN CODE - BODY MEANS THE FULL BACKGROUND - PROFILE MEANS ANYTHING WITHIN THE MIDDLE SECTION
-
-<style>
-body {
-    background: url(https://64.media.tumblr.com/fd9dea9bd9c3d403dff1ac61caca1091/tumblr_orpi2cL3QU1wpzpibo1_400.gifv);
-}
-.profile {
-background-image:url(https://wallpapercave.com/wp/wp7153946.jpg);
-  background-repeat: repeat;
-    border-radius: 12px;
-}
-/*the username glow and shadow*/
-h1
-{
-	color: /*the username glow and shadow*/
-h1
-{         color: turquoise; 
-	//text-shadow: 1px 1px #ffd1dc;
-	
-};
-	text-shadow: 2px 2px 3px #ffd1dc, 0 0 25px #ffd1dc, 0 0 5px black;
-}
-h1, h2, h3, h4,h5,a, p, nav label, .section
-{
-	
-main, top, links, nav .top, nav .links, details-table
-{
-    background:  !important;
-	background-image:   !important;
-	background-size: cover !important;
-    padding: 0 !important;
-    /*font-size: small;*/
-    color: #00FFEF;
-{
-
-.mood
-text-transform:uppercase !important;
-}
-
-table, td
-}
-	/* border: 1px solid var(--url-pink-bg)!important; */
-	border-spacing: 2px;
-}
-
-.profile .contact, .profile .url-info, .profile .table-section, .home-actions
-{
-    width: 100%;
-    border: 2px solid var(--#ffd1dc);
-}
-table, th, td
-
-}
-   border: 1px solid #ffd1dc;
-   border-spacing: 2px;
-}
-.blog
-}   
-   border: 10px solid #ffd1dc;
-}
-.profile .contact, .profile .url-info, .profile .table-section, .home-actions
-}
-   width: 100%;
-   border: 4px outset #ffd1dc;
-   margin 10px 2;
-}
-
-.online
-{
-  color: gold!important; 
-  //text-shadow: 1px 1px turquoise;
-}
-
-:root 
-{
-	--logo-blue: ;
- 	--darker-blue: ;
-	--lighter-blue: purple 55;
-	--even-lighter-blue: ;
-	--lightest-blue: ;
-	--dark-orange: ;
-	--light-orange: ;
-	--even-lighter-orange: ;
-	--turquoise: ;
-        
-        --table-header:#ffd1dc;
-	--table-color: white;
-	--link-text: white;
-	--main-text: white;
-
-    }   
-main 
-{
-  /* changes made to stuff outside of columns */
-    background: black;
-    padding: 0;
-    font-size: small;
-    color: #00FFEF;
-text color: turquoise;
-  text-shadow: 1px 1px 2px #000000, 0 0 25px #000000, 0 0 3px #000000; 
-}
-footer 
-{
-    background: turquoise!important;
-}
-.comments-table{
-display: block;
-height: 500px;
-overflow-y: scroll;
-Border-radius: 15px; 
-color: turquoise;
-  text-shadow: 1px 1px 2px #000000, 0 0 25px #000000, 0 0 3px #000000; 
-}
-.contact {
-  border-radius: 8px;
-  background-image: url(https://data.whicdn.com/images/349633308/original.gif);
-  background-position: right top;
-  background-repeat: repeat;
-background-attachment: scroll;
-Width: 310px;
-Height:180px;
-
-color: black;
-  text-shadow: 1px 1px 2px #39ff14, 0 0 25px #39ff14, 0 0 3px #39ff14; 
-}
-.friends th, tr, .friends td, th, .icon, main, .comments-table, .friends, .profile-info, .table, .table-section,  .url-info, .mood, .blurbs, .blog-preview, .details, 
-{
-border: 1px curve #000000 !important;
-outline: curve !important;
-}
-img
-{
-border-radius: 12px;
-}
-
-main {
-background:  black;
-border-radius: 14px;
-padding: 0;
-font-size: 85%;
-color: #000000;
-}
-
-nav, footer, .profile .contact {
-display: inherit !important;
-opacity: 1 !important;
-border-radius: 12px;
-}
-main {
-background:  ;
-border-radius: 12px;
-border: 12px solid #000000;
-padding: 0;
-font-size: 90%;
-color: #00FFEF;
-}
-nav .top {
-  background: transparent;
-}
-
-nav .links {
-  background: rgba(0, 0, 0, 0.3);
-}
-
-nav { background-image: url(https://64.media.tumblr.com/b305a18f19862af6acf46fdad8949649/b5987e3961527536-94/s2048x3072/a25f22fd8a7d5c893f8edb36aab4fdc807234922.gif) 
-}
-
-
-/*customising interests box*/
-  .profile .table-section{
-    border:2px solid #c50576;
-    border-radius: 15px;
-  }
-  .profile .table-section .heading{
-    background:#000000;
-    border: 1px solid #c50576;
-    border-radius: 15px 15px 0px 0px;
-    text-align: center;
-  }
-  .profile .table-section .heading h4{
-    color: #c50576;
-    text-shadow: 1px 1px 2px black;
-  }
-  .profile .table-section .details-table td{
-    background: rgba(0, 0, 0, 0);
-    padding-right: 10%;
-  }
- /*customising friend space heading*/
-  .profile .friends .heading{
-    background: #c50576;
-    color: #ffffff;
-    text-shadow: 1px 1px 2px black;
-    text-align: center;
-  }
-  .profile .friends .heading h4{
-    text-align: center;
-    color: #ffffff;
-    text-shadow: 1px 1px 2px black
-  }
-.general-about {
-	background-image: url(https://64.media.tumblr.com/1e2598616e90eb0f6b243be1b9642ae1/5583e57f872090cb-79/s2048x3072_c0,21726,100000,77976/ccaa0b27eaa3ea333eeb0df8a6838f4600d3117c.gif);
-	padding: 20px;
-	border-radius: 10px;
-	box-shadow: 4px 4px 0 #2d1157;
-	text-align: center;
-	animation: nineties2 2s ease 0s infinite normal none;
-	animation-delay: .46s;
-}
-.profile .blurbs .section :nth-child(2) {
-	background-image: url(https://i.pinimg.com/originals/70/ea/cb/70eacb83950c11dbaba19267eacc3496.gif);
-     /* margin-top: -5px; */
-	padding: 18px;
-	box-shadow: 4px 4px 0 #000;
-}
-
-.profile .profile-info .inner h3 {
-	filter: drop-shadow(3px 3px 0 #000000);
-	margin: 0!important;
-	color:#FFF;
-}
-.profile .profile-info .inner h3 a {
-	color: #FFFFFF;
-}
-.profile .profile-info {
-	background-image: url(https://64.media.tumblr.com/d62f9c09497fe39ad002fb18c45bf61b/2c14b464e52d1596-fa/s400x600/db8362b0df0aae30ad31efa61ff058b9f1b91317.jpg);
-	padding: 20px;
-	border: none;
-	border-radius: 10px;
-	box-shadow: 4px 4px 0 #2d1157;
-	text-align: center;
-	animation: nineties2 2s ease 0s infinite normal none;
-	animation-delay: .15s;
-	border: none;
-}
-
-</style>
+            currentIndex++;
+            document.getElementById('count').innerText = currentIndex;
+            document.getElementById('btn-total').innerText = container.querySelectorAll('button').length;
+        }
+    </script>
+</body>
+</html>
