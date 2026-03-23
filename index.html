@@ -1,196 +1,268 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>čašekOS</title>
-    <style>
-        :root {
-            --bg-color: #000;
-            --glass: rgba(255, 255, 255, 0.1);
-            --accent: #00f2ff;
-        }
+<!-- (c) Layout created by TheJasmineSixx (LunaGloomyCore) (https://layouts.spacehey.com/layout?id=611) -->
 
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica;
-            background: #000;
-        }
+<img src="imageorglittertexturl"/>
 
-        /* The Phone Frame */
-        #phone {
-            width: 100vw; height: 100vh;
-            background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop') center/cover;
-            position: relative;
-            transition: filter 0.5s;
-        }
+<img src="imageorglittertexturl"/>
 
-        /* --- DYNAMIC ISLAND --- */
-        #dynamic-island {
-            position: absolute;
-            top: 15px; left: 50%;
-            transform: translateX(-50%);
-            width: 120px; height: 35px;
-            background: #000;
-            border-radius: 20px;
-            transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            z-index: 1000;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 12px; overflow: hidden;
-            cursor: pointer;
-        }
+<img src="imageorglittertexturl"/>
 
-        #dynamic-island.expanded {
-            width: 350px; height: 80px;
-            border-radius: 35px;
-        }
 
-        /* --- HOME SCREEN GRID --- */
-        #home-screen {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 25px;
-            padding: 80px 30px;
-            display: none;
-        }
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Potta+One&display=swap');
+body{font-family: "potta one" ;}
+</style> 
 
-        .app-icon {
-            display: flex; flex-direction: column; align-items: center; gap: 8px;
-            color: white; font-size: 12px; cursor: pointer;
-        }
+CODE BELOW GOES UNDER YOUR ABOUT ME PARAGRAPH
 
-        .icon-box {
-            width: 60px; height: 60px;
-            border-radius: 15px;
-            background: linear-gradient(145deg, #1e1e1e, #111);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px;
-        }
+<img src="giforimageurl"/>
 
-        /* --- LOCK SCREEN --- */
-        #lock-screen {
-            position: absolute; inset: 0;
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: flex-start; padding-top: 120px;
-            color: white; z-index: 50;
-            backdrop-filter: blur(10px);
-        }
+<img src="giforimageurl"/> 
 
-        .time { font-size: 80px; font-weight: 200; }
-        .date { font-size: 20px; margin-top: -10px; }
+<img src="giforimageurl"/> 
 
-        /* --- NAVIGATION BAR --- */
-        #nav-bar {
-            position: absolute; bottom: 10px; left: 50%;
-            transform: translateX(-50%);
-            width: 130px; height: 5px;
-            background: rgba(255,255,255,0.8);
-            border-radius: 10px; cursor: pointer;
-        }
+<img src="giforimageurl"/> 
+<img src="giforimageurl"/> 
 
-        /* --- APPS WINDOW --- */
-        .app-window {
-            position: absolute; inset: 0;
-            background: white; z-index: 100;
-            display: none; transform: translateY(100%);
-            transition: transform 0.4s ease-in-out;
-            padding: 40px 20px; border-radius: 30px 30px 0 0;
-        }
+<img src="giforimageurl"/>
 
-        .app-window.active { display: block; transform: translateY(0); }
-    </style>
-</head>
-<body>
+<img src="giforimageurlORglittertext"/>
 
-    <div id="phone">
-        <div id="dynamic-island" onclick="toggleIsland()">
-            <span id="island-content"></span>
-        </div>
+TO ADD YOUTUBE VIDEO CLICK SHARE, EMBED, COPY THEN PASTE HERE ONLY CHANGING THE WIDTH AND HEIGHT TO 350 AND 215
 
-        <div id="lock-screen" onclick="unlock()">
-            <div class="time" id="clock">12:00</div>
-            <div class="date">Sunday, March 22</div>
-            <p style="margin-top: auto; margin-bottom: 50px; opacity: 0.6;">Tap to unlock čašekOS</p>
-        </div>
 
-        <div id="home-screen">
-            <div class="app-icon" onclick="openApp('notes')">
-                <div class="icon-box" style="background: #ffcc00;">📝</div>
-                <span>Notes</span>
-            </div>
-            <div class="app-icon" onclick="notifyIsland('Charging... 88%')">
-                <div class="icon-box" style="background: #4cd964;">⚡</div>
-                <span>Battery</span>
-            </div>
-            <div class="app-icon" onclick="openApp('music')">
-                <div class="icon-box" style="background: #ff2d55;">🎵</div>
-                <span>Music</span>
-            </div>
-            <div class="app-icon" onclick="location.reload()">
-                <div class="icon-box" style="background: #5856d6;">🔄</div>
-                <span>Reset</span>
-            </div>
-        </div>
+MAIN CODE - BODY MEANS THE FULL BACKGROUND - PROFILE MEANS ANYTHING WITHIN THE MIDDLE SECTION
 
-        <div id="notes" class="app-window">
-            <h1>Notes</h1>
-            <textarea style="width: 100%; height: 200px; border: none; font-size: 18px;" placeholder="Write something..."></textarea>
-        </div>
+<style>
+body {
+    background: url(https://64.media.tumblr.com/fd9dea9bd9c3d403dff1ac61caca1091/tumblr_orpi2cL3QU1wpzpibo1_400.gifv);
+}
+.profile {
+background-image:url(https://wallpapercave.com/wp/wp7153946.jpg);
+  background-repeat: repeat;
+    border-radius: 12px;
+}
+/*the username glow and shadow*/
+h1
+{
+	color: /*the username glow and shadow*/
+h1
+{         color: turquoise; 
+	//text-shadow: 1px 1px #ffd1dc;
+	
+};
+	text-shadow: 2px 2px 3px #ffd1dc, 0 0 25px #ffd1dc, 0 0 5px black;
+}
+h1, h2, h3, h4,h5,a, p, nav label, .section
+{
+	
+main, top, links, nav .top, nav .links, details-table
+{
+    background:  !important;
+	background-image:   !important;
+	background-size: cover !important;
+    padding: 0 !important;
+    /*font-size: small;*/
+    color: #00FFEF;
+{
 
-        <div id="nav-bar" onclick="goHome()"></div>
-    </div>
+.mood
+text-transform:uppercase !important;
+}
 
-    <script>
-        // Update Clock
-        function updateClock() {
-            const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('clock').innerText = `${h}:${m}`;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+table, td
+}
+	/* border: 1px solid var(--url-pink-bg)!important; */
+	border-spacing: 2px;
+}
 
-        // OS Logic
-        function unlock() {
-            document.getElementById('lock-screen').style.display = 'none';
-            document.getElementById('home-screen').style.display = 'grid';
-            notifyIsland("Welcome to čašekOS");
-        }
+.profile .contact, .profile .url-info, .profile .table-section, .home-actions
+{
+    width: 100%;
+    border: 2px solid var(--#ffd1dc);
+}
+table, th, td
 
-        function goHome() {
-            document.querySelectorAll('.app-window').forEach(app => {
-                app.classList.remove('active');
-            });
-            notifyIsland("čašekOS Home");
-        }
+}
+   border: 1px solid #ffd1dc;
+   border-spacing: 2px;
+}
+.blog
+}   
+   border: 10px solid #ffd1dc;
+}
+.profile .contact, .profile .url-info, .profile .table-section, .home-actions
+}
+   width: 100%;
+   border: 4px outset #ffd1dc;
+   margin 10px 2;
+}
 
-        function openApp(id) {
-            document.getElementById(id).classList.add('active');
-            notifyIsland(`Opening ${id}...`);
-        }
+.online
+{
+  color: gold!important; 
+  //text-shadow: 1px 1px turquoise;
+}
 
-        // Dynamic Island Logic
-        let islandTimeout;
-        function notifyIsland(text) {
-            const island = document.getElementById('dynamic-island');
-            const content = document.getElementById('island-content');
-            
-            clearTimeout(islandTimeout);
-            island.classList.add('expanded');
-            content.innerText = text;
+:root 
+{
+	--logo-blue: ;
+ 	--darker-blue: ;
+	--lighter-blue: purple 55;
+	--even-lighter-blue: ;
+	--lightest-blue: ;
+	--dark-orange: ;
+	--light-orange: ;
+	--even-lighter-orange: ;
+	--turquoise: ;
+        
+        --table-header:#ffd1dc;
+	--table-color: white;
+	--link-text: white;
+	--main-text: white;
 
-            islandTimeout = setTimeout(() => {
-                island.classList.remove('expanded');
-                setTimeout(() => content.innerText = "", 400);
-            }, 3000);
-        }
+    }   
+main 
+{
+  /* changes made to stuff outside of columns */
+    background: black;
+    padding: 0;
+    font-size: small;
+    color: #00FFEF;
+text color: turquoise;
+  text-shadow: 1px 1px 2px #000000, 0 0 25px #000000, 0 0 3px #000000; 
+}
+footer 
+{
+    background: turquoise!important;
+}
+.comments-table{
+display: block;
+height: 500px;
+overflow-y: scroll;
+Border-radius: 15px; 
+color: turquoise;
+  text-shadow: 1px 1px 2px #000000, 0 0 25px #000000, 0 0 3px #000000; 
+}
+.contact {
+  border-radius: 8px;
+  background-image: url(https://data.whicdn.com/images/349633308/original.gif);
+  background-position: right top;
+  background-repeat: repeat;
+background-attachment: scroll;
+Width: 310px;
+Height:180px;
 
-        function toggleIsland() {
-            const island = document.getElementById('dynamic-island');
-            island.classList.toggle('expanded');
-        }
-    </script>
-</body>
-</html>
+color: black;
+  text-shadow: 1px 1px 2px #39ff14, 0 0 25px #39ff14, 0 0 3px #39ff14; 
+}
+.friends th, tr, .friends td, th, .icon, main, .comments-table, .friends, .profile-info, .table, .table-section,  .url-info, .mood, .blurbs, .blog-preview, .details, 
+{
+border: 1px curve #000000 !important;
+outline: curve !important;
+}
+img
+{
+border-radius: 12px;
+}
+
+main {
+background:  black;
+border-radius: 14px;
+padding: 0;
+font-size: 85%;
+color: #000000;
+}
+
+nav, footer, .profile .contact {
+display: inherit !important;
+opacity: 1 !important;
+border-radius: 12px;
+}
+main {
+background:  ;
+border-radius: 12px;
+border: 12px solid #000000;
+padding: 0;
+font-size: 90%;
+color: #00FFEF;
+}
+nav .top {
+  background: transparent;
+}
+
+nav .links {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+nav { background-image: url(https://64.media.tumblr.com/b305a18f19862af6acf46fdad8949649/b5987e3961527536-94/s2048x3072/a25f22fd8a7d5c893f8edb36aab4fdc807234922.gif) 
+}
+
+
+/*customising interests box*/
+  .profile .table-section{
+    border:2px solid #c50576;
+    border-radius: 15px;
+  }
+  .profile .table-section .heading{
+    background:#000000;
+    border: 1px solid #c50576;
+    border-radius: 15px 15px 0px 0px;
+    text-align: center;
+  }
+  .profile .table-section .heading h4{
+    color: #c50576;
+    text-shadow: 1px 1px 2px black;
+  }
+  .profile .table-section .details-table td{
+    background: rgba(0, 0, 0, 0);
+    padding-right: 10%;
+  }
+ /*customising friend space heading*/
+  .profile .friends .heading{
+    background: #c50576;
+    color: #ffffff;
+    text-shadow: 1px 1px 2px black;
+    text-align: center;
+  }
+  .profile .friends .heading h4{
+    text-align: center;
+    color: #ffffff;
+    text-shadow: 1px 1px 2px black
+  }
+.general-about {
+	background-image: url(https://64.media.tumblr.com/1e2598616e90eb0f6b243be1b9642ae1/5583e57f872090cb-79/s2048x3072_c0,21726,100000,77976/ccaa0b27eaa3ea333eeb0df8a6838f4600d3117c.gif);
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 4px 4px 0 #2d1157;
+	text-align: center;
+	animation: nineties2 2s ease 0s infinite normal none;
+	animation-delay: .46s;
+}
+.profile .blurbs .section :nth-child(2) {
+	background-image: url(https://i.pinimg.com/originals/70/ea/cb/70eacb83950c11dbaba19267eacc3496.gif);
+     /* margin-top: -5px; */
+	padding: 18px;
+	box-shadow: 4px 4px 0 #000;
+}
+
+.profile .profile-info .inner h3 {
+	filter: drop-shadow(3px 3px 0 #000000);
+	margin: 0!important;
+	color:#FFF;
+}
+.profile .profile-info .inner h3 a {
+	color: #FFFFFF;
+}
+.profile .profile-info {
+	background-image: url(https://64.media.tumblr.com/d62f9c09497fe39ad002fb18c45bf61b/2c14b464e52d1596-fa/s400x600/db8362b0df0aae30ad31efa61ff058b9f1b91317.jpg);
+	padding: 20px;
+	border: none;
+	border-radius: 10px;
+	box-shadow: 4px 4px 0 #2d1157;
+	text-align: center;
+	animation: nineties2 2s ease 0s infinite normal none;
+	animation-delay: .15s;
+	border: none;
+}
+
+</style>
